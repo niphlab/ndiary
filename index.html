@@ -1,0 +1,37 @@
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.20.min.js"></script>
+</head>
+<body>
+    <div id="status"></div>
+    <ul id="objects"></ul>
+
+    <script type="text/javascript">
+        // var dataRef = new Firebase('https://fiery-inferno-5964.firebaseio.com/web/data');
+        // var date = new Date()
+	// dataRef.set({'date': date.toString(),
+	//	     'day': '2015-03-26',
+	//	     'title': 'my first diary',
+	//	     'text': 'haha'
+	//	   })
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: 'us-east-1:6d972ccd-94c2-42d8-9b44-05cee89bdc40',
+        });
+        AWS.config.region = 'us-west-2'
+        var bucket = new AWS.S3({params: {Bucket: 'ndiary'}});
+	bucket.listObjects(function (err, data){
+	  if (err) {
+	    document.getElementById('status').innerHTML = 'Could not load objects from S3' + err;
+	  } else {
+            document.getElementById('status').innerHTML = 'Loaded ' + data.Contents.length + ' items from S3';
+	    for (var i = 0; i < data.Contents.length; i++) {
+	      document.getElementById('objects').innerHTML += '<li>' + data.Contents[i].Key + '</li>'; 
+	    }
+	  }
+	});
+    </script>
+</body>
+</html>
